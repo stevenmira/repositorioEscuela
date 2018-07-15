@@ -1,0 +1,27 @@
+@page {
+            margin-top: 0.0em;
+            margin-left: 3.0em;
+            margin-right: 3.0em;
+            margin-bottom: 0.0em;
+        }
+
+@font-face {
+    font-family: "ari";
+    src: url(css/ari.ttf);
+}
+
+table{
+	border-collapse: collapse;
+	width: 100%;
+}
+
+td{
+	padding: 0px;
+	text-align: center;
+}
+th{
+	border: 0.5px solid #333;
+}
+tr{
+	border: 1px solid #333;
+}
