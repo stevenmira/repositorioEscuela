@@ -136,6 +136,11 @@ Route::get('libretapdf', function(){
   $pdf = PDF::loadView('libreta')->setPaper('Letter', 'landscape')->setWarnings(false)->save('LibretaNotas.pdf');
   return $pdf->stream('LibretaNotas.pdf');
 });
+Route::get('municipios/{id}','HojaVidaController@showPDF');
+
+Route::get('expediente/matricula2/{id}','ImprimirController@imprimirMatricula');
+
+
 
 
 

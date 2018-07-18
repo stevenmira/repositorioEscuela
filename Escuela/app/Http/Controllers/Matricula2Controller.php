@@ -381,4 +381,93 @@ class Matricula2Controller extends Controller
     	return Redirect::to('expediente/matricula2');
     }
 
+     public function show($id)      //Para mostrar
+    {
+        $usuarioactual=\Auth::user();
+
+        $matricula = Matricula::findOrFail($id);
+
+        //Encontramos el  detalle de la matricula
+        $dg = $matricula->iddetallegrado;
+        $detalleg = DetalleGrado::findOrFail($dg);
+
+        $idgrado= $detalleg->idgrado;
+        $idseccion=$detalleg->idseccion;
+        $idturno=$detalleg->idturno;
+
+        $grado = Grado::findOrFail($idgrado);
+        $seccion = Seccion::findOrFail($idseccion);
+        $turno = Turno::findOrFail($idturno);
+
+
+        $nie = $matricula->nie;
+
+        $estudiante = Estudiante::where('nie',$nie)->first();
+        $detallepartida = PartidaNacimiento::where('nie',$nie)->first();
+
+        //Se obtienen los datos de la madre, padre, contacto
+        $detalleM = Responsable::where('nie',$nie)->where('idresponsable',1)->first();
+        $detalleP = Responsable::where('nie',$nie)->where('idresponsable',2)->first();
+        $detalleC = Responsable::where('nie',$nie)->where('idresponsable',3)->first();
+
+        $parientes = DB::table('detalle_pariente as dp')
+            ->where('dp.nie',$nie)
+            ->orderBy('dp.id_detalle','desc')
+            ->get();
+
+        $count = DetallePariente::where('nie', $nie)->count();
+
+
+        $parientess = DB::table('detalle_pariente as pariente')
+        ->select('estudiante.nombre','estudiante.apellido','estudiante.nie','pariente.id_detalle','pariente.parentesco','matricula.fotografia', 'matricula.id_matricula','grado.nombre as grado','seccion.nombre as seccion','turno.nombre as turno')
+        ->join('estudiante as estudiante','pariente.nie','=','estudiante.nie','full outer')
+        ->join('matricula as matricula','pariente.nie','=','matricula.nie','full outer')
+        ->join('detalle_grado as detalle_grado','matricula.iddetallegrado','=','detalle_grado.iddetallegrado','full outer')
+        ->join('grado as grado','detalle_grado.idgrado','=','grado.idgrado','full outer')
+        ->join('seccion as seccion','detalle_grado.idseccion','=','seccion.idseccion','full outer')
+        ->join('turno as turno','detalle_grado.idturno','=','turno.idturno','full outer')
+        ->where('pariente.id_matricula','=',$id)
+        ->orderby('estudiante.apellido','asc')
+        ->get();
+
+        setlocale(LC_ALL,"es_ES");
+
+        $fechaa = $matricula->fechamatricula; 
+        $fecha_explode = explode("-",$fechaa);
+        $anio = $fecha_explode[0];
+        $mes = $fecha_explode[1];
+        $dia = $fecha_explode[2];
+
+        $hoy = date("d-MM-Y");
+
+        $hoi = explode("-", $hoy);
+
+        $aniohoy = $hoi[2];
+        setlocale(LC_TIME, "spanish");
+        $meshoy = ucfirst(strftime("%B"));
+        $diahoy = $hoi[0];
+
+        $edad=$this -> CalculaEdad($estudiante->fechadenacimiento);
+
+
+
+        $vistaurl="matriculalguien";
+        return $this ->crearPDF($vistaurl,$matricula,$grado,$seccion,$turno,$estudiante,$detallepartida,$detalleM, $detalleP, $detalleC, $parientess, $usuarioactual,$anio,$aniohoy,$meshoy,$diahoy,$edad);
+    }
+
+    public function crearPDF($vistaurl,$matricula,$grado,$seccion,$turno,$estudiante,$detallepartida,$detalleM, $detalleP, $detalleC, $parientess, $usuarioactual,$anio,$aniohoy,$meshoy,$diahoy,$edad)
+    {
+        $view=\View::make($vistaurl, compact('matricula','grado','seccion','turno','estudiante','detallepartida','detalleM', 'detalleP', 'detalleC', 'parientess', 'usuarioactual','anio','aniohoy','meshoy','diahoy','edad'))->render();
+
+        $pdf =\App::make('dompdf.wrapper');
+        $pdf->loadHTML($view);
+        return $pdf->stream($estudiante->apellido.$estudiante->nombre.$turno->nombre.$grado->nombre.$seccion->nombre.$estudiante->nie);
+
+    } 
+
+    public function CalculaEdad( $fecha ) {
+        list($Y,$m,$d) = explode("-",$fecha);
+        return( date("md") < $m.$d ? date("Y")-$Y-1 : date("Y")-$Y );
+    }
+
 }

@@ -573,5 +573,73 @@ class HojaVidaController extends Controller
         return Redirect::to('docente/cvitae');
     }
 
+        public function showPDF($id_hoja)       //Para mostrar
+    {
+        $usuarioactual=\Auth::user();
+
+        //Se busca la hoja seleccionada
+        $hoja = HojaVida::findOrFail($id_hoja);
+
+        //Se busca el docente
+        $dui = $hoja->mdui;
+        $maestro = Maestro::where('mdui', $dui)->first();
+
+        //Se busca el estado civil del docente
+        $id_estado = $maestro->id_estado;
+        $estado = EstadoCivil::where('id_estado', $id_estado)->first();
+
+        //Se Busca la clase del docente
+        $id_clase = $hoja->id_clase;
+        $clase = Clase::where('id_clase', $id_clase)->first();
+
+        //Se Busca la categoria del docente
+        $id_categoria = $hoja->id_categoria;
+        $categoria = Categoria::where('id_categoria', $id_categoria)->first();
+
+        //Se Busca la nivel del docente
+        $id_nivel = $hoja->id_nivel;
+        $nivel = Nivel::where('id_nivel', $id_nivel)->first();
+
+        //Se Busca los estudios realizados por el docente
+        $estudios = MaestroEstudios::where('id_hoja', $id_hoja)->get();
+
+        //Se Busca las capacitaciones realizadas por el docente
+        $capacitaciones = MaestroCapacitacion::where('id_hoja', $id_hoja)->get();
+
+        //Se Busca el record laboral del docente
+        $trabajos = MaestroTrabajo::where('id_hoja', $id_hoja)->get();
+
+
+        //Se busca el Depto. y Municipio de Nacimiento
+        $mun = Municipio::where('id_municipio', $hoja->id_municipio)->first();
+        $flag = 0;
+        
+        if(!is_null($mun)){
+                $depto = Departamento::where('id_departamento', $mun->id_departamento)->first();
+                $flag = 1;
+            }
+
+        if($flag == 0){
+                $mun = new Municipio;
+                $mun->nombre ="No posee";
+
+                $depto = new Departamento;
+                $depto->nombre ="No posee";
+            }
+
+        $vistaurl="hojavidalguien";
+        return $this ->crearPDF($vistaurl,$hoja,$maestro,$estado,$clase, $categoria, $nivel, $estudios, $capacitaciones, $trabajos,$mun, $depto, $usuarioactual);
+    }
+
+    public function crearPDF($vistaurl,$hoja,$maestro,$estado,$clase, $categoria, $nivel, $estudios, $capacitaciones, $trabajos,$mun, $depto, $usuarioactual)
+    {
+        $view=\View::make($vistaurl, compact('hoja','maestro','estado','clase', 'categoria', 'nivel', 'estudios', 'capacitaciones', 'trabajos','mun', 'depto', 'usuarioactual'))->render();
+
+        $pdf =\App::make('dompdf.wrapper');
+        $pdf->loadHTML($view);
+        return $pdf->stream('HojaDeVidaProf'.$maestro->nombre.$maestro->apellido);
+
+    } 
+
    
 }
