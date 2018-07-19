@@ -70,7 +70,7 @@
 						<th style="text-align: center;">Familiares</th>
 						<th style="text-align: center;">Nueva</th>
 						<th style="text-align: center;">Opciones</th>
-
+						<th>Imprimir</th>
 					</thead>
 	               @foreach ($estudiantes as $ma)
 					<tr>
@@ -92,6 +92,9 @@
 							<a href="{{URL::action('MatriculaController@show',$ma->id_matricula)}}"><button class="btn btn-warning">Ver</button></a>
 	                         <a href="" data-target="#modal-delete-{{$ma->id_matricula}}" data-toggle="modal"><button class="btn btn-danger">Eliminar</button></a>
 						</td>
+						<td>
+				            <a href="{{URL::action('Matricula2Controller@show',$ma->id_matricula)}}" target="_blank"><button class="btn btn-danger"><i class="fa fa-print"></i></button></a>
+				         </td>
 					</tr>
 					@include('expediente.matricula.modal')
 					@endforeach

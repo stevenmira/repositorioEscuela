@@ -107,6 +107,7 @@
                 <th>Capacitac.</th>
                 <th>Trabajos</th>
                 <th>Opciones</th>
+                <th>Imprimir</th>
             </tr>
             
         </thead>
@@ -137,8 +138,11 @@
                     <td>
                         <a href="{{URL::action('HojaVidaController@edit',$ho->id_hoja)}}"><button class="btn btn-info">Editar</button></a>
                         <a href="{{URL::action('HojaVidaController@show',$ho->id_hoja)}}"><button class="btn btn-warning">Ver</button></a>
-                        <a href="{{URL::action('HojaVidaController@showPDF',$ho->id_hoja)}}" target="_blank"><button class="btn btn-danger">Imprimir</button></a>
+                        
                          <a href="" data-target="#modal-delete-{{$ho->id_hoja}}" data-toggle="modal"><button class="btn btn-danger">Eliminar</button></a>
+                    </td>
+                    <td>
+                        <a href="{{URL::action('HojaVidaController@showPDF',$ho->id_hoja)}}" target="_blank"><button class="btn btn-danger"><i class="fa fa-print"></i> </button></a>
                     </td>
                 </tr>
             </tbody>

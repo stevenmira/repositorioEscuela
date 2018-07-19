@@ -88,6 +88,7 @@
 					<th>Apellido</th>
 					<th>Foto</th>
 					<th>Opciones</th>
+          <th>Imprimir</th>
 				</thead>
                @foreach ($matriculas as $ma)
 				<tr>
@@ -102,7 +103,6 @@
 						<a href="{{URL::action('Matricula2Controller@edit',$ma->id_matricula)}}"><button class="btn btn-success">Nueva</button></a>
 						<a href="{{URL::action('MatriculaController@show',$ma->id_matricula)}}"><button class="btn btn-warning">Ver</button></a>
 						<a href="{{URL::action('MatriculaController@edit',$ma->id_matricula)}}"><button class="btn btn-info">Editar</button></a>
-            <a href="{{URL::action('Matricula2Controller@show',$ma->id_matricula)}}" target="_blank"><button class="btn btn-danger">Imprimir</button></a>
 
 						@if($ma->estado == 'Activo')
                          <a href="" data-target="#modal-delete-{{$ma->id_matricula}}" data-toggle="modal"><button class="btn btn-danger">Eliminar</button></a>
@@ -110,6 +110,10 @@
                         <a href="" data-target="#modal-delete-{{$ma->id_matricula}}" data-toggle="modal"><button class="btn btn-primary">Activar</button></a>
                         @endif
 					</td>
+          <td>
+            <a href="{{URL::action('Matricula2Controller@show',$ma->id_matricula)}}" target="_blank"><button class="btn btn-danger"><i class="fa fa-print"></i></button></a>
+          </td>
+
 				</tr>
 				@include('expediente.matricula2.modal')
 				@endforeach
